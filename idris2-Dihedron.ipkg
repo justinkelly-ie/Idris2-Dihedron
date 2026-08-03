@@ -1,0 +1,11 @@
+package idris2-Dihedron
+version = 0.1.0
+authors = "Justin"
+
+depends = base, linear, idris2-Multiset
+
+sourcedir = "src"
+
+modules = Math.Dihedron.Basis
+        , Math.Dihedron.Dihedron
+        , Math.Dihedron.Subalgebras

@@ -1,0 +1,19 @@
+[custom.all.idris2-Dihedron]
+type = "local"
+path = "."
+ipkg = "idris2-Dihedron.ipkg"
+
+[custom.all.idris2-Dihedron-test]
+type = "local"
+path = "."
+ipkg = "idris2-Dihedron-test.ipkg"
+
+[custom.all.idris2-Multiset]
+type = "local"
+path = "../idris2-Multiset"
+ipkg = "idris2-Multiset.ipkg"
+
+[custom.all.idris2-QuickCheck]
+type = "local"
+path = "../idris2-QuickCheck"
+ipkg = "idris2-QuickCheck.ipkg"
