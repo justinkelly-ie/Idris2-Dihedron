@@ -1,7 +1,8 @@
 module Math.Dihedron.Subalgebras
 
 import public Math.Dihedron.Dihedron
-import public Math.DualComplex
+import Math.Infinitesimal
+import Core.VexelMaxel
 
 %default total
 
@@ -38,7 +39,7 @@ public export
 toDihedronGreen : GreenComplex -> Dihedron
 toDihedronGreen (MkGreen r d) = MkDihedron r 0 0 d
 
-||| Conversion from DualComplex (where ε² = 0) to Green Degenerate Sub-algebra.
+||| Conversion from Maxel Dual Number (where ε² = 0) to Green Degenerate Sub-algebra.
 public export
-fromDualComplex : DualComplex -> GreenComplex
-fromDualComplex (MkDual r e) = MkGreen r e
+fromMaxelDualNumber : Maxel -> GreenComplex
+fromMaxelDualNumber m = MkGreen (dualReal m) (dualEps m)

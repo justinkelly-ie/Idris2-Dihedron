@@ -1,7 +1,7 @@
 module Math.Dihedron.Dihedron
 
 import public Math.Dihedron.Basis
-import public Math.BoxInt
+import public Core.BoxInt
 import public Math.Multiset
 
 %default total

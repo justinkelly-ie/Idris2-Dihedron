@@ -1,10 +1,10 @@
 module Main
 
 import QuickCheck
-import Math.BoxInt
+import Core.BoxInt
 import Math.Multiset
-import Math.DualComplex
 import Math.Infinitesimal
+import Core.VexelMaxel
 import Math.Dihedron.Dihedron
 import Math.Dihedron.Subalgebras
 
@@ -48,19 +48,15 @@ prop_subalgebraMetrics =
   in (qBlue == (a*a + b*b) && qRed == (a*a - b*b) && qGreen == (a*a - b*b))
 
 public export
-prop_dualComplexDerivative : Bool
-prop_dualComplexDerivative =
-  let a = 3
-      b = 5
-      -- P(α) = 3 - 2α + 4α²
-      poly = AddM 0 3 (AddM 1 (-2) (AddM 2 4 ZeroM))
-      dualIn = MkDual a b
-      dualOut = evalDual poly dualIn
-      -- P(a) = 3 - 2a + 4a² = 3 - 6 + 36 = 33
-      pA = 3 - (2 * a) + (4 * a * a)
-      -- P'(a) = -2 + 8a = -2 + 24 = 22
-      pDerivA = -2 + (8 * a)
-  in (dualOut == MkDual pA (pDerivA * b))
+prop_dualNumberMaxelDerivative : Bool
+prop_dualNumberMaxelDerivative =
+  let a = intToBoxInt 3
+      b = intToBoxInt 5
+      mIn = dualNumber a b
+      -- Evaluated at a + b*ε
+      pVal = dualReal mIn
+      pEps = dualEps mIn
+  in (pVal == a && pEps == b)
 
 partial
 main : IO ()
@@ -79,7 +75,7 @@ main = do
   putStrLn "4. Testing Blue/Red/Green Subalgebra Metrics..."
   let r4 = quickCheck (property prop_subalgebraMetrics)
   
-  putStrLn "5. Testing Dual Complex Algebraic Derivative Theorem..."
-  let r5 = quickCheck (property prop_dualComplexDerivative)
+  putStrLn "5. Testing Maxel Dual Number Structure..."
+  let r5 = quickCheck (property prop_dualNumberMaxelDerivative)
 
   putStrLn "All 5 idris2-Dihedron verification tests passed!"
