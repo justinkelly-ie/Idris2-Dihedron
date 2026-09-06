@@ -6,52 +6,83 @@ import public Math.Multiset
 
 %default total
 
-||| A Dihedron element D = a·1 + b·i + c·j + d·k over BoxInt.
+||| A Dihedron element D = a·1 + b·i + c·j + d·k over scalar payload.
 public export
-record Dihedron where
-  constructor MkDihedron
-  scalarA : BoxInt -- Scalar (1)
-  blueB   : BoxInt -- Blue (i, i² = -1)
-  redC    : BoxInt -- Red (j, j² = +1)
-  greenD  : BoxInt -- Green (k, k² = +1)
+record DihedronVal scalar where
+  constructor MkDihedronVal
+  scalarA : scalar -- Scalar (1)
+  blueB   : scalar -- Blue (i, i² = -1)
+  redC    : scalar -- Red (j, j² = +1)
+  greenD  : scalar -- Green (k, k² = +1)
 
 public export
-a : Dihedron -> BoxInt
-a (MkDihedron s _ _ _) = s
+Dihedron : Type
+Dihedron = DihedronVal BoxInt
 
 public export
-b : Dihedron -> BoxInt
-b (MkDihedron _ bl _ _) = bl
+MkDihedron : BoxInt -> BoxInt -> BoxInt -> BoxInt -> Dihedron
+MkDihedron a b c d = MkDihedronVal a b c d
 
 public export
-c : Dihedron -> BoxInt
-c (MkDihedron _ _ r _) = r
+a : DihedronVal scalar -> scalar
+a (MkDihedronVal s _ _ _) = s
 
 public export
-d : Dihedron -> BoxInt
-d (MkDihedron _ _ _ g) = g
+b : DihedronVal scalar -> scalar
+b (MkDihedronVal _ bl _ _) = bl
 
 public export
-Eq Dihedron where
-  (MkDihedron a1 b1 c1 d1) == (MkDihedron a2 b2 c2 d2) =
+c : DihedronVal scalar -> scalar
+c (MkDihedronVal _ _ r _) = r
+
+public export
+d : DihedronVal scalar -> scalar
+d (MkDihedronVal _ _ _ g) = g
+
+public export
+(Eq scalar) => Eq (DihedronVal scalar) where
+  (MkDihedronVal a1 b1 c1 d1) == (MkDihedronVal a2 b2 c2 d2) =
     (a1 == a2) && (b1 == b2) && (c1 == c2) && (d1 == d2)
 
 public export
-Show Dihedron where
-  show (MkDihedron a b c d) =
+(Show scalar) => Show (DihedronVal scalar) where
+  show (MkDihedronVal a b c d) =
     show a ++ " + " ++ show b ++ "i + " ++ show c ++ "j + " ++ show d ++ "k"
+
+------------------------------------------------------------------------
+-- FUNCTOR, APPLICATIVE & MONAD IMPLEMENTATIONS
+------------------------------------------------------------------------
+
+public export
+Functor DihedronVal where
+  map f (MkDihedronVal a b c d) = MkDihedronVal (f a) (f b) (f c) (f d)
+
+public export
+Applicative DihedronVal where
+  pure x = MkDihedronVal x x x x
+  (MkDihedronVal f g h k) <*> (MkDihedronVal a b c d) =
+    MkDihedronVal (f a) (g b) (h c) (k d)
+
+public export
+Monad DihedronVal where
+  (MkDihedronVal a b c d) >>= f =
+    MkDihedronVal (scalarA (f a)) (blueB (f b)) (redC (f c)) (greenD (f d))
+
+------------------------------------------------------------------------
+-- ALGEBRAIC INTERFACES (SEMIGROUP & MONOID)
+------------------------------------------------------------------------
 
 ||| Addition of Dihedrons.
 public export
 addDihedron : Dihedron -> Dihedron -> Dihedron
-addDihedron (MkDihedron a1 b1 c1 d1) (MkDihedron a2 b2 c2 d2) =
-  MkDihedron (a1 + a2) (b1 + b2) (c1 + c2) (d1 + d2)
+addDihedron (MkDihedronVal a1 b1 c1 d1) (MkDihedronVal a2 b2 c2 d2) =
+  MkDihedronVal (a1 + a2) (b1 + b2) (c1 + c2) (d1 + d2)
 
 ||| Negation of Dihedron.
 public export
 negDihedron : Dihedron -> Dihedron
-negDihedron (MkDihedron a b c d) =
-  MkDihedron (-a) (-b) (-c) (-d)
+negDihedron (MkDihedronVal a b c d) =
+  MkDihedronVal (-a) (-b) (-c) (-d)
 
 ||| Subtraction of Dihedrons.
 public export
@@ -61,34 +92,54 @@ subDihedron d1 d2 = addDihedron d1 (negDihedron d2)
 ||| Multiplication of Dihedrons via basis multiplication table.
 public export
 mulDihedron : Dihedron -> Dihedron -> Dihedron
-mulDihedron (MkDihedron a1 b1 c1 d1) (MkDihedron a2 b2 c2 d2) =
+mulDihedron (MkDihedronVal a1 b1 c1 d1) (MkDihedronVal a2 b2 c2 d2) =
   let resA = (a1 * a2) - (b1 * b2) + (c1 * c2) + (d1 * d2)
       resB = (a1 * b2) + (b1 * a2) + (c1 * d2) - (d1 * c2)
       resC = (a1 * c2) + (c1 * a2) - (b1 * d2) + (d1 * b2)
       resD = (a1 * d2) + (d1 * a2) - (b1 * c2) + (c1 * b2)
-  in MkDihedron resA resB resC resD
+  in MkDihedronVal resA resB resC resD
+
+||| Additive Semigroup instance for Dihedron.
+public export
+Semigroup Dihedron where
+  (<+>) = addDihedron
+
+||| Additive Monoid instance for Dihedron.
+public export
+Monoid Dihedron where
+  neutral = MkDihedron 0 0 0 0
+
+||| Multiplicative Semigroup named implementation for Dihedron.
+public export
+[MultDihedronSemigroup] Semigroup Dihedron where
+  (<+>) = mulDihedron
+
+||| Multiplicative Monoid named implementation for Dihedron.
+public export
+[MultDihedronMonoid] Monoid Dihedron where
+  neutral = MkDihedron 1 0 0 0
 
 ||| Scalar multiplication.
 public export
 scaleDihedron : BoxInt -> Dihedron -> Dihedron
-scaleDihedron s (MkDihedron a b c d) =
-  MkDihedron (s * a) (s * b) (s * c) (s * d)
+scaleDihedron s (MkDihedronVal a b c d) =
+  MkDihedronVal (s * a) (s * b) (s * c) (s * d)
 
 ||| Half-Trace T(D) = a
 public export
 halfTrace : Dihedron -> BoxInt
-halfTrace (MkDihedron a _ _ _) = a
+halfTrace (MkDihedronVal a _ _ _) = a
 
 ||| Conjugation D* = a - bi - cj - dk
 public export
 conjugateDihedron : Dihedron -> Dihedron
-conjugateDihedron (MkDihedron a b c d) =
-  MkDihedron a (-b) (-c) (-d)
+conjugateDihedron (MkDihedronVal a b c d) =
+  MkDihedronVal a (-b) (-c) (-d)
 
 ||| Quadrance (Determinant) Q(D) = a² + b² - c² - d²
 public export
 quadranceDihedron : Dihedron -> BoxInt
-quadranceDihedron (MkDihedron a b c d) =
+quadranceDihedron (MkDihedronVal a b c d) =
   (a * a) + (b * b) - (c * c) - (d * d)
 
 ||| Symmetric bilinear form <D1, D2> = T(D1 * D2*)
