@@ -5,7 +5,8 @@ authors = "Justin"
 depends = Idris2-Multiset-Core, Idris2-Multiset-Transform, base, linear
 sourcedir = "src"
 
-modules = Math.Dihedron.Basis,
+modules = Dihedron,
+          Math.Dihedron.Basis,
           Math.Dihedron.Dihedron,
           Math.Dihedron.Subalgebras
 
