@@ -3,6 +3,8 @@ module Math.Dihedron.Dihedron
 import public Math.Dihedron.Basis
 import public Core.BoxInt
 import public Math.Multiset
+import Math.OnSeq.FusedStream
+import Data.Fuel
 
 %default total
 
@@ -157,3 +159,72 @@ public export
 Neg Dihedron where
   negate = negDihedron
   (-) = subDihedron
+
+------------------------------------------------------------------------
+-- 2. COMPILE-TIME DIHEDRAL SYMMETRY WITNESSES
+------------------------------------------------------------------------
+
+||| Evaluates discrete norm quadrance conservation under Dihedral conjugation: Q(D*) == Q(D).
+public export
+isDihedralConjugateNormPreserved : Dihedron -> Bool
+isDihedralConjugateNormPreserved d =
+  quadranceDihedron (conjugateDihedron d) == quadranceDihedron d
+
+||| Erased compile-time proof witness verifying Dihedral norm invariance under algebra conjugation.
+public export
+0 DihedralInvarianceWitness : Dihedron -> Type
+DihedralInvarianceWitness d = isDihedralConjugateNormPreserved d = True
+
+||| Static compile-time witness for baseline Dihedron element (1 + 2i + 3j + 4k).
+public export
+0 prfDihedronConjugateNormInvariance : DihedralInvarianceWitness (MkDihedron (intToBoxInt 1) (intToBoxInt 2) (intToBoxInt 3) (intToBoxInt 4))
+prfDihedronConjugateNormInvariance = Refl
+
+||| Bounded Dihedral state carrying compile-time erased symmetry witness.
+public export
+record BoundedDihedralState (d : Dihedron) where
+  constructor MkBoundedDihedralState
+  dihedronVal : Dihedron
+  0 symmetryPrf : DihedralInvarianceWitness d
+
+------------------------------------------------------------------------
+-- 3. DEFORESTED DIHEDRAL ACTION STREAMS
+------------------------------------------------------------------------
+
+||| Discrete Dihedral action step record.
+public export
+record DihedralStep where
+  constructor MkDihedralStep
+  stepId   : Int
+  normVal  : BoxInt
+  val      : Dihedron
+
+public export
+Eq DihedralStep where
+  (MkDihedralStep id1 n1 v1) == (MkDihedralStep id2 n2 v2) =
+    id1 == id2 && n1 == n2 && v1 == v2
+
+||| O(1) allocation deforested stream transducer folding product of Dihedrons across a stream.
+public export covering
+fusedDihedralActionStream : Fuel -> List Dihedron -> Dihedron
+fusedDihedralActionStream f steps =
+  fusedHylomorphism f
+    (\(idx, st) => case st of
+                     [] => Done
+                     d :: rest => Yield (MkDihedralStep idx (quadranceDihedron d) d) (idx + 1, rest))
+    (\step, acc => mulDihedron (val step) acc)
+    (MkDihedron (intToBoxInt 1) (intToBoxInt 0) (intToBoxInt 0) (intToBoxInt 0))
+    (1, steps)
+
+||| O(1) allocation deforested stream transducer evaluating total sum of quadrances across a Dihedron stream.
+public export covering
+fusedComputeTotalQuadrance : Fuel -> List Dihedron -> BoxInt
+fusedComputeTotalQuadrance f steps =
+  fusedHylomorphism f
+    (\(idx, st) => case st of
+                     [] => Done
+                     d :: rest => Yield (MkDihedralStep idx (quadranceDihedron d) d) (idx + 1, rest))
+    (\step, acc => normVal step + acc)
+    (intToBoxInt 0)
+    (1, steps)
+
