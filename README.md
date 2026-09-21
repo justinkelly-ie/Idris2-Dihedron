@@ -1,11 +1,11 @@
-# Idris2-Dihedron
+# FinSc-Dihedron
 
 [![Idris 2 Verification](https://img.shields.io/badge/Idris_2-0.8.0-blue.svg)](https://www.idris-lang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Layer 3d 4D Clifford Hypercomplex Subalgebras & Spatial Torsion for Idris 2**
 
-`Idris2-Dihedron` forms **Layer 3d** of the 10-layer constructive non-linear multiset science framework. It formalizes 4D Clifford hypercomplex basis elements ($1, i, j, k$), dihedral group actions, metric splitting into elliptic, hyperbolic, and parabolic components, and discrete 4D spatial torsion.
+`FinSc-Dihedron` forms **Layer 3d** of the 10-layer constructive non-linear multiset science framework. It formalizes 4D Clifford hypercomplex basis elements ($1, i, j, k$), dihedral group actions, metric splitting into elliptic, hyperbolic, and parabolic components, and discrete 4D spatial torsion.
 
 ---
 
@@ -28,8 +28,8 @@
 ## 🚀 Building & Installing
 
 ```bash
-idris2 --build Idris2-Dihedron.ipkg
-idris2 --install Idris2-Dihedron.ipkg
+idris2 --build FinSc-Dihedron.ipkg
+idris2 --install FinSc-Dihedron.ipkg
 ```
 
 ---

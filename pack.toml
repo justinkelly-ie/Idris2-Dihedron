@@ -8,20 +8,20 @@ type = "local"
 path = "."
 ipkg = "idris2-Dihedron-test.ipkg"
 
-[custom.all.Idris2-Multiset-Core]
+[custom.all.FinSc-Multiset-Core]
 type = "local"
-path = "../Idris2-Multiset-Core"
-ipkg = "Idris2-Multiset-Core.ipkg"
+path = "../FinSc-Multiset-Core"
+ipkg = "FinSc-Multiset-Core.ipkg"
 
-[custom.all.Idris2-Multiset-Transform]
+[custom.all.FinSc-Multiset-Transform]
 type = "local"
-path = "../Idris2-Multiset-Transform"
-ipkg = "Idris2-Multiset-Transform.ipkg"
+path = "../FinSc-Multiset-Transform"
+ipkg = "FinSc-Multiset-Transform.ipkg"
 
-[custom.all.Idris2-Geometry]
+[custom.all.FinSc-Geometry]
 type = "local"
-path = "../Idris2-Geometry"
-ipkg = "Idris2-Geometry.ipkg"
+path = "../FinSc-Geometry"
+ipkg = "FinSc-Geometry.ipkg"
 
 [custom.all.idris2-QuickCheck]
 type = "local"
